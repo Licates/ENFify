@@ -177,7 +177,7 @@ def phase_estimation_DFT1(s_tone, sampling_rate, N_DFT, f0_estimated):
 
 
 # DFT1 instantaneous frequency estimation with old segment
-def segmented_freq_estimation_DFT1_old(s_in, f_s, num_cycles, N_DFT, nominal_enf):
+def segmented_freq_estimation_DFT1_old(s_in, sampling_rate, num_cycles, N_DFT, nominal_enf):
     """
     Estimates the instantaneous frequency of an input signal using DFT1 for segments.
 
@@ -191,7 +191,7 @@ def segmented_freq_estimation_DFT1_old(s_in, f_s, num_cycles, N_DFT, nominal_enf
     Returns:
         numpy.ndarray: An array of estimated frequencies corresponding to each segment of the input signal.
     """
-    step_size = int(f_s // nominal_enf)  # samples per nominal enf cycle
+    step_size = int(sampling_rate // nominal_enf)  # samples per nominal enf cycle
 
     num_blocks = len(s_in) // step_size - (num_cycles - 1)
 
@@ -199,7 +199,7 @@ def segmented_freq_estimation_DFT1_old(s_in, f_s, num_cycles, N_DFT, nominal_enf
 
     freqs = []
     for i in range(len(segments)):
-        freq = freq_estimation_DFT1(segments[i], f_s, N_DFT)
+        freq = freq_estimation_DFT1(segments[i], sampling_rate, N_DFT)
         freqs.append(freq)
 
     freqs = np.array(freqs)
@@ -259,6 +259,44 @@ def segmented_phase_estimation_DFT1(
 
     for i in range(0, len(s_in), step_size):
         segments.append(s_in[i : i + window_len])
+
+    phases = []
+    for segment in segments:
+        phase = phase_estimation_DFT1(segment, sampling_rate, N_DFT, nominal_enf)
+        phases.append(phase)
+
+    phases = [2 * (x + np.pi / 2) for x in phases]
+    phases = np.unwrap(phases)
+    phases = [(x / 2.0 - np.pi / 2) for x in phases]
+
+    return phases
+
+
+# DFT1 instantaneous phase estimation
+def segmented_phase_estimation_DFT1_old(
+    s_in, sampling_rate, nominal_enf, N_DFT, step_size, num_cycles
+):
+    """
+    Estimates the instantaneous phase of an input signal using DFT1 for segments.
+
+    Args:
+        s_in (numpy.ndarray): The input signal for phase estimation
+        sampling_rate (float): The sampling rate of the input signal
+        nominal_enf (float): The nominal electrical network frequency
+        N_DFT (int): The number of points for the DFT
+        step_size (int): The number of samples to shift between segments
+        window_len (int): The length of each segment to analyze
+
+    Returns:
+        numpy.ndarray: An array of estimated phases corresponding to each segment of the input signal.
+    """
+    segments = []
+
+    step_size = int(sampling_rate // nominal_enf)  # samples per nominal enf cycle
+
+    num_blocks = len(s_in) // step_size - (num_cycles - 1)
+
+    segments = [s_in[i * step_size : (i + num_cycles) * step_size] for i in range(num_blocks)]
 
     phases = []
     for segment in segments:

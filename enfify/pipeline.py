@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 
 from enfify.preprocessing import (
-    # bandpass_filter,
+    bandpass_filter,
     # downsample_ffmpeg,
     downsample_scipy_new,
     # downsample_ffmpeg,
@@ -16,6 +16,8 @@ from enfify.enf_estimation import (
     segmented_freq_estimation_DFT1,
     STFT,
     segmented_phase_estimation_DFT1,
+    segmented_phase_estimation_DFT1_old,
+    segmented_phase_estimation_hilbert_new,
 )
 
 
@@ -143,10 +145,11 @@ def phase_CNNBiLSTM_feature_pipeline(sig, sample_freq, config):
     # Bandpass Filter
     bandpass_config = config["bandpass_filter"]
     if bandpass_config["is_enabled"]:
-        # lowcut = bandpass_config["lowcut"]
-        # highcut = bandpass_config["highcut"]
-        # order = bandpass_config["order"]
-        sig = fir_bandpass_filter(sig, sample_freq, nom_enf, deltaf=1, N=1_000)
+        lowcut = bandpass_config["lowcut"]
+        highcut = bandpass_config["highcut"]
+        order = bandpass_config["order"]
+        # sig = fir_bandpass_filter(sig, sample_freq, nom_enf, deltaf=0.6, N=10_000)
+        sig = bandpass_filter(sig, lowcut, highcut, sample_freq, order)
 
     # Variational Mode Decomposition
     VMD_config = config["VMD"]
@@ -173,9 +176,9 @@ def phase_CNNBiLSTM_feature_pipeline(sig, sample_freq, config):
         sig = RFA_STFT(sig, downsample_freq, tau, i, f0, window_len, step_size)
 
     # Calculate the instantaneous phases
-    feature_phases = segmented_phase_estimation_DFT1(
-        sig, downsample_freq, nom_enf, n_dft, step_size, window_len
-    )
+    # feature_phases = segmented_phase_estimation_DFT1(sig, downsample_freq, nom_enf, n_dft, step_size, 10)
+
+    feature_phases = segmented_phase_estimation_hilbert_new(sig, step_size, window_len)
 
     # Cut the boundary to weaken boundary value problems
     feature_phases = feature_phases[40:-40]

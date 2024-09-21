@@ -158,16 +158,14 @@ def fir_bandpass_filter(sig, sampling_rate, nominal_enf, deltaf, N):
     f2 = nominal_enf + deltaf / 2
 
     # Normalize the frequencies to [0, 1] (Nyquist is 1)
-    w1 = f1 * 2 * np.pi / sampling_rate
-    w2 = f2 * 2 * np.pi / sampling_rate
-    Wn = [w1 / np.pi, w2 / np.pi]
+    w1 = f1 / sampling_rate
+    w2 = f2 / sampling_rate
+    Wn = [w1, w2]
     # Wn = [f1, f2]
     # Wn = [w1, w2]
 
     # h = signal.firwin(N, Wn, pass_zero=False, fs=sampling_rate)  # FIR Filter Design
-    h = signal.firwin(
-        N, Wn, width=0.0012, window="hann", pass_zero=False, scale=True, fs=sampling_rate
-    )  # FIR Filter Design
+    h = signal.firwin(N + 1, Wn, pass_zero=False)  # FIR Filter Design
     sig_len = len(sig)  # Length of the signal
 
     # Filter the signal with zero-padding for shorter signals
@@ -178,7 +176,9 @@ def fir_bandpass_filter(sig, sampling_rate, nominal_enf, deltaf, N):
         padded_signal = np.concatenate((np.zeros(pad_length), sig, np.zeros(pad_length)))
 
         # Apply the zero-phase filtering
-        filtered_signal = signal.filtfilt(h, 1, padded_signal)
+        filtered_signal = signal.filtfilt(
+            h, 1, padded_signal, padtype="odd", padlen=3 * (max(len(h), 1) - 1)
+        )
 
         # Remove the padding
         sig = sig[pad_length : pad_length + sig_len]
@@ -189,7 +189,9 @@ def fir_bandpass_filter(sig, sampling_rate, nominal_enf, deltaf, N):
         padded_signal = np.concatenate((np.zeros(1000), sig, np.zeros(1000)))
 
         # Apply the zero-phase filtering
-        filtered_signal = signal.filtfilt(h, 1, padded_signal)
+        filtered_signal = signal.filtfilt(
+            h, 1, padded_signal, padtype="odd", padlen=3 * (max(len(h), 1) - 1)
+        )
 
         # Remove the padding
         sig = sig[1000 : 1000 + sig_len]
