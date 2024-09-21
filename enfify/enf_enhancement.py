@@ -3,7 +3,8 @@
 # TODO: Add paper DOI links in docstrings of functions.
 
 import numpy as np
-import math
+
+# import math
 
 from enfify.enf_estimation import segmented_freq_estimation_DFT1
 from tqdm import tqdm
@@ -261,19 +262,12 @@ def VMD(signal, alpha, tau, num_modes, enforce_DC, tolerance):
         mode_spectra_final (array): Final mode spectra
         final_freq_centers (array): Center frequencies of modes
     """
-
-    # Mirror signal at boundaries
+    # Handle odd signal lengths
     if len(signal) % 2:
-        midpoint = math.ceil(len(signal) / 2)
-        left_mirror = np.concatenate((np.flipud(signal[: midpoint - 1]), signal), axis=0)
-        mirrored_signal = np.concatenate((left_mirror, np.flipud(signal[midpoint:])), axis=0)
-    else:
-        midpoint = len(signal) // 2
-        left_mirror = np.concatenate((np.flipud(signal[:midpoint]), signal), axis=0)
-        mirrored_signal = np.concatenate((left_mirror, np.flipud(signal[midpoint:])), axis=0)
+        signal = signal[:-1]
 
     # Define time and frequency domains
-    total_length = len(mirrored_signal)
+    total_length = len(signal)
     time_domain = np.arange(1, total_length + 1) / total_length
     spectral_domain = time_domain - 0.5 - (1 / total_length)
 
@@ -282,7 +276,7 @@ def VMD(signal, alpha, tau, num_modes, enforce_DC, tolerance):
     mode_alphas = alpha * np.ones(num_modes)
 
     # FFT of the mirrored signal and preparation for iterations
-    signal_spectrum = np.fft.fftshift(np.fft.fft(mirrored_signal))
+    signal_spectrum = np.fft.fftshift(np.fft.fft(signal))
     positive_spectrum = np.copy(signal_spectrum)
     positive_spectrum[: total_length // 2] = 0
 
