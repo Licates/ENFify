@@ -112,19 +112,6 @@ uncut_temporal = []
 cut_spatial = []
 cut_temporal = []
 
-for file in tqdm(uncut_files_car):
-    # basename = os.path.splitext(os.path.basename(file))[0]
-    sig, sample_freq = librosa.load(file)
-    with open(ENFIFY_DIR / "config_springer.yml", "r") as f:
-        config = yaml.safe_load(f)
-    uncut_spatial_phase, uncut_temporal_phase = phase_CNNBiLSTM_feature_pipeline(
-        sig, sample_freq, config
-    )
-    print(file)
-    uncut_spatial.append(uncut_spatial_phase)
-    uncut_temporal.append(uncut_temporal_phase)
-
-
 for file in tqdm(cut_files_car):
     # basename = os.path.splitext(os.path.basename(file))[0]
     sig, sample_freq = librosa.load(file)
@@ -136,6 +123,19 @@ for file in tqdm(cut_files_car):
     print(file)
     cut_spatial.append(cut_spatial_phase)
     cut_temporal.append(cut_temporal_phase)
+
+
+for file in tqdm(uncut_files_car):
+    # basename = os.path.splitext(os.path.basename(file))[0]
+    sig, sample_freq = librosa.load(file)
+    with open(ENFIFY_DIR / "config_springer.yml", "r") as f:
+        config = yaml.safe_load(f)
+    uncut_spatial_phase, uncut_temporal_phase = phase_CNNBiLSTM_feature_pipeline(
+        sig, sample_freq, config
+    )
+    print(file)
+    uncut_spatial.append(uncut_spatial_phase)
+    uncut_temporal.append(uncut_temporal_phase)
 
 
 # Label Combine and shuffle the Data
