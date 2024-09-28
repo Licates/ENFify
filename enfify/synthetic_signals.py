@@ -23,9 +23,9 @@ def func_ENF_synthesis_corrupted_harmonic(
     N = int(duration * fs)
 
     # Create fundamental IF
-    f0 = np.random.randn(N)
-    enf_freq = np.cumsum(f0) * 0.00005
-    enf_freq = enf_freq / np.std(enf_freq) * np.sqrt(4.5e-4)
+    f0 = np.random.randn(N) * 0.001
+    enf_freq = np.cumsum(f0) * 0.0001
+    enf_freq = enf_freq / np.std(enf_freq) * np.sqrt(1e-5)
     enf_freq = enf_freq + fundamental_f
     enf_freqs = np.outer(harmonic_index, enf_freq)  # Instantaneous freqs across all harmonics
 

@@ -194,15 +194,6 @@ def fir_bandpass_filter(sig, sampling_rate, nominal_enf, deltaf, N):
         sig = sig[1000 : 1000 + sig_len]
         filtered_signal = filtered_signal[1000 : 1000 + sig_len]
 
-    """
-    w, h = signal.freqz(h, worN=8000, fs=sampling_rate)
-    plt.plot(w, 20 * np.log10(abs(h)))
-    plt.title("Frequency response of the FIR filter")
-    plt.xlabel("Frequency (Hz)")
-    plt.ylabel("Gain (dB)")
-    plt.grid()
-    plt.show()"""
-
     return filtered_signal
 
 

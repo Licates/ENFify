@@ -224,8 +224,11 @@ def segmented_freq_estimation_DFT1(s_in, sampling_rate, N_DFT, step_size, window
     """
     segments = []
 
-    for i in range(0, len(s_in), step_size):
-        segments.append(s_in[i : i + window_len])
+    step_size = step_size * sampling_rate
+    window_len = window_len * sampling_rate
+
+    for i in range(0, len(s_in), int(step_size)):
+        segments.append(s_in[i : i + int(window_len)])
 
     freqs = []
     for i in range(len(segments)):
@@ -257,8 +260,11 @@ def segmented_phase_estimation_DFT1(
     """
     segments = []
 
-    for i in range(0, len(s_in), step_size):
-        segments.append(s_in[i : i + window_len])
+    step_size = 20
+    window_len = 200
+
+    for i in range(0, len(s_in), int(step_size)):
+        segments.append(s_in[i : i + int(window_len)])
 
     phases = []
     for segment in segments:
@@ -327,7 +333,7 @@ def hilbert_instantaneous_phase(signal):
 
 
 # Hilbert segmented phase estimation
-def segmented_phase_estimation_hilbert_new(s_in, step_size, window_len):
+def segmented_phase_estimation_hilbert_new(s_in, sampling_rate, step_size, window_len):
     """
     Estimates the mean instantaneous phase of segments of a signal using the Hilbert transform.
 
@@ -342,6 +348,11 @@ def segmented_phase_estimation_hilbert_new(s_in, step_size, window_len):
     window_type = "hann"
 
     segments = []
+
+    step_size = step_size * sampling_rate
+    window_len = window_len * sampling_rate
+    step_size = int(step_size)
+    window_len = int(window_len)
 
     for i in range(0, len(s_in), step_size):
         segments.append(s_in[i : i + window_len])
@@ -485,6 +496,12 @@ def STFT(signal, sampling_rate, step_size, window_len):
     Returns:
         freqs (numpy.ndarray): Array of dominant frequencies over time (in Hz).
     """
+
+    step_size = step_size * sampling_rate
+    window_len = window_len * sampling_rate
+    step_size = int(step_size)
+    window_len = int(window_len)
+
     # Compute the Short-Time Fourier Transform (STFT)
     X = librosa.stft(
         signal, n_fft=window_len, hop_length=step_size, win_length=window_len, window="hamming"

@@ -59,10 +59,7 @@ def freq_CNN_feature_pipeline(sig, sample_freq, config):
     # Bandpass Filter
     bandpass_config = config["bandpass_filter"]
     if bandpass_config["is_enabled"]:
-        # lowcut = bandpass_config["lowcut"]
-        # highcut = bandpass_config["highcut"]
-        # order = bandpass_config["order"]
-        sig = fir_bandpass_filter(sig, sample_freq, nom_enf, deltaf=0.6, N=10_000)
+        sig = fir_bandpass_filter(sig, sample_freq, nom_enf, deltaf=0.6, N=100)
 
     # Variational Mode Decomposition
     VMD_config = config["VMD"]
@@ -86,7 +83,7 @@ def freq_CNN_feature_pipeline(sig, sample_freq, config):
         tau = RFA_config["tau"]
         # epsilon = RFA_config["epsilon"]
 
-        sig = RFA_STFT(sig, downsample_freq, tau, i, f0, window_len, step_size)
+        sig = RFA_DFT1(sig, downsample_freq, tau, i, f0, window_len, step_size, n_dft)
 
     # Calculate the instantaneous frequencies
     feature_freqs = segmented_freq_estimation_DFT1(
@@ -148,7 +145,7 @@ def phase_CNNBiLSTM_feature_pipeline(sig, sample_freq, config):
         # lowcut = bandpass_config["lowcut"]
         # highcut = bandpass_config["highcut"]
         # order = bandpass_config["order"]
-        sig = fir_bandpass_filter(sig, sample_freq, nom_enf, deltaf=0.6, N=10_000)
+        sig = fir_bandpass_filter(sig, sample_freq, nom_enf, deltaf=0.6, N=100)
         # sig = bandpass_filter(sig, lowcut, highcut, sample_freq, order)
 
     # Variational Mode Decomposition
@@ -244,7 +241,7 @@ def freq_CNNBiLSTM_feature_pipeline(sig, sample_freq, config):
         # lowcut = bandpass_config["lowcut"]
         # highcut = bandpass_config["highcut"]
         # order = bandpass_config["order"]
-        sig = fir_bandpass_filter(sig, sample_freq, nom_enf, deltaf=0.6, N=10_000)
+        sig = fir_bandpass_filter(sig, sample_freq, nom_enf, deltaf=0.6, N=1000)
 
     # Variational Mode Decomposition
     VMD_config = config["VMD"]
@@ -270,7 +267,9 @@ def freq_CNNBiLSTM_feature_pipeline(sig, sample_freq, config):
         sig = RFA_DFT1(sig, downsample_freq, tau, i, f0, window_len, step_size, n_dft)
 
     # Calculate the instantaneous frequencies
-    feature_freqs = STFT(sig, downsample_freq, step_size, window_len)
+    feature_freqs = segmented_freq_estimation_DFT1(
+        sig, downsample_freq, n_dft, step_size, window_len
+    )
 
     # Cut the boundary to weaken boundary value problems
     feature_freqs = feature_freqs[40:-40]

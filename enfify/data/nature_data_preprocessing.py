@@ -8,31 +8,23 @@ from pathlib import Path
 from enfify.config import ENFIFY_DIR
 from enfify.pipeline import freq_CNN_feature_pipeline
 
-RAW_DATA_DIR = Path("/home/leo_dacasi/Dokumente/summerofcode/Enfify Data Synced/raw")
 PROCESSED_DATA_DIR = Path("/home/leo_dacasi/Dokumente/summerofcode/Enfify Data Synced/processed")
-INTERIM_DATA_DIR = Path("")
+INTERIM_DATA_DIR = Path(
+    "/home/leo_dacasi/Dokumente/summerofcode/Enfify Data Synced/interim/Carioca/Carioca_10s"
+)
 
 # Paths
-FEATURE_PATH = PROCESSED_DATA_DIR / "Carioca1_new"
+FEATURE_PATH = PROCESSED_DATA_DIR / "Carioca_10s_CNN_BiLSTM"
 os.makedirs(FEATURE_PATH, exist_ok=True)
 
-# Uncut
-uncut_files = Path(INTERIM_DATA_DIR / "Carioca1" / "authentic" / "*.wav")
-uncut_files = sorted(glob(str(uncut_files)))
+# Get Cut and Uncut Files
+filenames = sorted(glob(str(Path(INTERIM_DATA_DIR / "*.wav"))))
+cut_files = [f for f in filenames if "tamp" in f]
+uncut_files = [f for f in filenames if "auth" in f]
+
+cut_freqs = []
 uncut_freqs = []
 
-for file in tqdm(uncut_files):
-    basename = os.path.splitext(os.path.basename(file))[0]
-    sample_freq, sig = wavfile.read(file)
-    with open(ENFIFY_DIR / "config_nature.yml", "r") as f:
-        config = yaml.safe_load(f)
-    uncut_freq = freq_CNN_feature_pipeline(sig, sample_freq, config)
-    uncut_freqs.append(uncut_freq)
-
-# Cut
-cut_files = Path(INTERIM_DATA_DIR / "Carioca1" / "tampered" / "*.wav")
-cut_files = sorted(glob(str(cut_files)))
-cut_freqs = []
 
 for file in tqdm(cut_files):
     basename = os.path.splitext(os.path.basename(file))[0]
@@ -41,6 +33,17 @@ for file in tqdm(cut_files):
         config = yaml.safe_load(f)
     cut_freq = freq_CNN_feature_pipeline(sig, sample_freq, config)
     cut_freqs.append(cut_freq)
+    print(len(cut_freq))
+
+
+for file in tqdm(uncut_files):
+    basename = os.path.splitext(os.path.basename(file))[0]
+    sample_freq, sig = wavfile.read(file)
+    with open(ENFIFY_DIR / "config_nature.yml", "r") as f:
+        config = yaml.safe_load(f)
+    uncut_freq = freq_CNN_feature_pipeline(sig, sample_freq, config)
+    uncut_freqs.append(uncut_freq)
+    print(len(uncut_freq))
 
 # Label Combine and shuffle the Data
 labels = np.concatenate([np.ones(len(cut_freqs)), np.zeros(len(uncut_freqs))])

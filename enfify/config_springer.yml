@@ -15,16 +15,16 @@ downsampling_frequency_per_nominal_enf: 20
 # Bandpass Filter Configuration
 bandpass_filter:
   is_enabled: true
-  lowcut: 99.5    # Low cut frequency in Hz
-  highcut: 100.5   # High cut frequency in Hz
+  lowcut: 59.5    # Low cut frequency in Hz
+  highcut: 60.5   # High cut frequency in Hz
   order: 1
   bandpass_delta: 0.6
-  bandpass_order: 10_000
+  bandpass_order: 1000
 
 
 # Variational Mode Decomposition (VMD)
 VMD: 
-  is_enabled: true
+  is_enabled: false
   loop: 1              # Number of VMD iterations
   alpha: 5_000          # Balancing parameter of the data-fidelity constraint
   tau: 0               # Noise-tolerance (no strict fidelity enforcement)
@@ -35,25 +35,25 @@ VMD:
 
 # Robust Filtering Algorithm (RFA)
 RFA: 
-  is_enabled: true
-  f0: 60                   # estimated frequency (here ENF second harmonic)     
+  is_enabled: false
+  f0: 50                   # estimated frequency (here ENF second harmonic)     
   I: 1                      # Number of RFA repeats
-  tau: 750           # RFA winoow size
+  tau: 300           # RFA winoow size
   epsilon: !!float 1e-20    # Noise-tolerance (no strict fidelity enforcement)
 
 
 # Phase Estimation Configuration
 phase_estimation:
   n_dft: 20_000             # Number of points in DFT for phase estimation
-  step_size: 20            # Step Size
-  window_len: 200          # Window Length
+  step_size: 0.02           # Step Size in seconds
+  window_len: 0.2           # Window Length in seconds
 
 
 # Freq Estimation Configuration
 freq_estimation:
   n_dft: 20_000             # Number of points in DFT for phase estimation
-  step_size: 20             # Step Size
-  window_len: 200           # Window Length
+  step_size: 0.02           # Step Size
+  window_len: 0.2          # Window Length
 
 
 feature_matrices:
@@ -63,4 +63,4 @@ feature_matrices:
 
 
 # Plot Results
-plot: true      # TODO: Switch not used yet.
+plot: true 

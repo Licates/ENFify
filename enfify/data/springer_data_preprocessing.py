@@ -2,49 +2,53 @@ import numpy as np
 import os
 from glob import glob
 import yaml
-from scipy.io import wavfile
+
+# from scipy.io import wavfile
 from tqdm import tqdm
 from pathlib import Path
 from enfify.config import ENFIFY_DIR
-from enfify.pipeline import freq_CNNBiLSTM_feature_pipeline
+from enfify.pipeline import phase_CNNBiLSTM_feature_pipeline, freq_CNNBiLSTM_feature_pipeline
+import librosa
 
-RAW_DATA_DIR = Path("/home/leo_dacasi/Dokumente/summerofcode/Enfify Data Synced/interim")
+INTERIM_DATA_DIR = Path(
+    "/home/leo_dacasi/Dokumente/summerofcode/Enfify Data Synced/external/Carioca/BASE CARIOCA ALL"
+)
 PROCESSED_DATA_DIR = Path("/home/leo_dacasi/Dokumente/summerofcode/Enfify Data Synced/processed")
 
 # Paths
-FEATURE_PATH = Path(PROCESSED_DATA_DIR / "Carioca_10s_freqs_CNNBiLSTM")
+FEATURE_PATH = Path(PROCESSED_DATA_DIR / "Carioca_freqs_original_CNNBiLSTM")
 os.makedirs(FEATURE_PATH, exist_ok=True)
 
 
-# Uncut
-uncut_files = Path(RAW_DATA_DIR / "Carioca1" / "authentic" / "*.wav")
-uncut_files = sorted(glob(str(uncut_files)))
+# Get Cut and Uncut Files
+filenames = sorted(glob(str(Path(INTERIM_DATA_DIR / "*.wav"))))
+
+
+cut_files = [f for f in filenames if "e" in Path(f).name]
+uncut_files = [f for f in filenames if "e" not in Path(f).name]
+
 uncut_spatial = []
 uncut_temporal = []
-
-
-# Cut
-cut_files = Path(RAW_DATA_DIR / "Carioca1" / "tampered" / "*.wav")
-cut_files = sorted(glob(str(cut_files)))
 cut_spatial = []
 cut_temporal = []
 
 
 for file in tqdm(cut_files):
-    basename = os.path.splitext(os.path.basename(file))[0]
-    sample_freq, sig = wavfile.read(file)
+    # basename = os.path.splitext(os.path.basename(file))[0]
+    sig, sample_freq = librosa.load(file)
+    # print(file)
     with open(ENFIFY_DIR / "config_springer.yml", "r") as f:
         config = yaml.safe_load(f)
     cut_spatial_phase, cut_temporal_phase = freq_CNNBiLSTM_feature_pipeline(
         sig, sample_freq, config
     )
     cut_spatial.append(cut_spatial_phase)
-    cut_temporal.append(cut_temporal_phase)
 
 
 for file in tqdm(uncut_files):
-    basename = os.path.splitext(os.path.basename(file))[0]
-    sample_freq, sig = wavfile.read(file)
+    # basename = os.path.splitext(os.path.basename(file))[0]
+    sig, sample_freq = librosa.load(file)
+    # print(file)
     with open(ENFIFY_DIR / "config_springer.yml", "r") as f:
         config = yaml.safe_load(f)
     uncut_spatial_phase, uncut_temporal_phase = freq_CNNBiLSTM_feature_pipeline(
@@ -68,6 +72,6 @@ temporal_data = np.array([temporal_data[i] for i in indices], dtype=object)
 labels = labels[indices]
 
 # Save the data
-np.save(str(FEATURE_PATH) + "/" + "synth_temporal_freqs_40s.npy", temporal_data)
-np.save(str(FEATURE_PATH) + "/" + "synth_spatial_freqs_40s.npy", spatial_data)
-np.save(str(FEATURE_PATH) + "/" + "synth_labels_40s_freqs.npy", labels)
+np.save(str(FEATURE_PATH) + "/" + "carioca_orig_temporal_freqs.npy", temporal_data)
+np.save(str(FEATURE_PATH) + "/" + "carioca_orig_spatial_freqs.npy", spatial_data)
+np.save(str(FEATURE_PATH) + "/" + "carioca_orig_labels_freqs.npy", labels)

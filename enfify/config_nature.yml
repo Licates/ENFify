@@ -22,8 +22,8 @@ bandpass_filter:
 
 # Variational Mode Decomposition (VMD)
 VMD: 
-  is_enabled: true
-  loop: 5              # Number of VMD iterations
+  is_enabled: false
+  loop: 1              # Number of VMD iterations
   alpha: 5000          # Balancing parameter of the data-fidelity constraint
   tau: 0               # Noise-tolerance (no strict fidelity enforcement)
   n_mode: 1            # Number of modes to be recovered
@@ -33,27 +33,26 @@ VMD:
 
 # Robust Filtering Algorithm (RFA)
 RFA: 
-  is_enabled: true
-  f0: 50                   # estimated frequency (here ENF second harmonic)     
-  I: 3                      # Number of RFA repeats
-  tau: 1000                # RFA winoow size
-  epsilon: !!float 1e-20    # Noise-tolerance (no strict fidelity enforcement)
+  is_enabled: false
+  f0: 50                  # estimated frequency (here ENF second harmonic)     
+  I: 1                     # Number of RFA repeats
+  tau: 200                # RFA winoow size
+  epsilon: !!float 1e-20   # Noise-tolerance (no strict fidelity enforcement)
 
 
 # Phase Estimation Configuration
 phase_estimation:
-  n_dft: 20000             # Number of points in DFT for phase estimation
-  step_size: 20            # Step Size
-  window_len: 200          # Window Length
+  n_dft: 20_000             # Number of points in DFT for phase estimation
+  step_size:  0.02          # Step Size in s
+  window_len: 0.2           # Window Length in s
 
 
 # Freq Estimation Configuration
 freq_estimation:
   n_dft: 20_000             # Number of points in DFT for phase estimation
-  step_size: 20             # Step Size
-  window_len: 200           # Window Length
+  step_size: 0.02           # Step Size
+  window_len: 0.2           # Window Length
 
 
 # Plot Results
-plot_results:
-  is_enabled: false         # TODO: Switch not used yet.
+plot: true          
