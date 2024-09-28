@@ -1,5 +1,6 @@
 # OUR GITIGNORE LINES
 kernel-metadata.json
+enfify_example_files
 
 lab*
 *.pdf
@@ -7,7 +8,6 @@ lab*
 *.wav
 *.png
 
-*example*
 *scratch*
 *temp*
 *hidden*
