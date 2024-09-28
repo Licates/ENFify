@@ -2,8 +2,7 @@ import numpy as np
 from scipy.io import wavfile
 
 
-# use enfify.examlpe_files
-def _create_auth_tamp_clip(raw_sig, sample_rate, clip_length, max_cutlen, auth_path, tamp_path):
+def create_auth_tamp_clip(raw_sig, sample_rate, clip_length, max_cutlen, auth_path, tamp_path):
     """
     Creates an authenticated and a tampered audio clip from the given raw signal.
 

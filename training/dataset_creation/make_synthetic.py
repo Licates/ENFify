@@ -15,8 +15,7 @@ SAMPLE_RATE = 1000  # Sampling rate in Hz
 NOMINAL_FREQ = 50  # Nominal frequency in Hz
 
 
-# use enfify.example_files
-def _func_ENF_synthesis_corrupted_harmonic(
+def func_ENF_synthesis_corrupted_harmonic(
     fundamental_f=NOMINAL_FREQ,
     harmonic_index=range(1, 7),
     corrupted_index=range(3, 7),
